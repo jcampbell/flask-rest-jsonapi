@@ -108,6 +108,11 @@ class RelatedObjectNotFound(ObjectNotFound):
     title = "Related object not found"
 
 
+class NestedObjectNotFound(ObjectNotFound):
+    """Error to warn that a nested object is not found"""
+
+    title = "Nested object not found"
+
 class RelationNotFound(JsonApiException):
     """Error to warn that a relationship is not found on a model"""
 
