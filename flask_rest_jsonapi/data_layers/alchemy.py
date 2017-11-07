@@ -397,25 +397,6 @@ class SqlalchemyDataLayer(BaseDataLayer):
 
         return related_object
 
-    def get_nested_object(self, nested_model, nested_id_field, obj):
-        """Get a nested object
-
-        :param Model nested_model: an sqlalchemy model
-        :param str nested_id_field: the identifier field of the nested model
-        :param DeclarativeMeta obj: the sqlalchemy object to retrieve related objects from
-        :return DeclarativeMeta: a related object
-        """
-        try:
-            nested_object = self.session.query(nested_model)\
-                                         .filter(getattr(nested_model, nested_id_field) == obj['id'])\
-                                         .one()
-        except NoResultFound:
-            raise NestedObjectNotFound('', "{}.{}: {} not found".format(nested_model.__name__,
-                                                                         nested_id_field,
-                                                                         obj['id']))
-
-        return nested_object
-
 
     def apply_relationships(self, data, obj):
         """Apply relationship provided by data to obj
@@ -457,8 +438,6 @@ class SqlalchemyDataLayer(BaseDataLayer):
         for key, value in data.items():
             if key in nested_fields:
                 nested_model = getattr(obj.__class__, key).property.mapper.class_
-                #schema_field = get_schema_field(self.resource.schema, key)
-                #nested_id_field = nested_model.id_field
 
                 if isinstance(value, list):
                     nested_objects = []
@@ -466,14 +445,8 @@ class SqlalchemyDataLayer(BaseDataLayer):
                     for identifier in value:
                         nested_object = nested_model(**identifier)
                         nested_objects.append(nested_object)
-                        #nested_object = self.get_nested_object(nested_model, nested_id_field,
-                        #                                         {'id': identifier})
-                        #nested_objects.append(nested_object)
 
                     nested_fields_to_apply.append({'field': key, 'value': nested_objects})
-
-                else:
-                    raise JsonApiException("Nested fields must be many to one.")
 
         for nested_field in nested_fields_to_apply:
             setattr(obj, nested_field['field'], nested_field['value'])
