@@ -137,11 +137,16 @@ class SqlalchemyDataLayer(BaseDataLayer):
         self.before_update_object(obj, data, view_kwargs)
 
         relationship_fields = get_relationships(self.resource.schema, model_field=True)
+        nested_fields = get_nested_fields(self.resource.schema, model_field=True)
+
+        join_fields = relationship_fields + nested_fields
+
         for key, value in data.items():
-            if hasattr(obj, key) and key not in relationship_fields:
+            if hasattr(obj, key) and key not in join_fields:
                 setattr(obj, key, value)
 
         self.apply_relationships(data, obj)
+        self.apply_nested_fields(data, obj)
 
         try:
             self.session.commit()
