@@ -11,7 +11,7 @@ from marshmallow.base import SchemaABC
 
 from flask import current_app
 from flask_rest_jsonapi.data_layers.base import BaseDataLayer
-from flask_rest_jsonapi.exceptions import RelationNotFound, RelatedObjectNotFound, NestedObjectNotFound, JsonApiException,\
+from flask_rest_jsonapi.exceptions import RelationNotFound, RelatedObjectNotFound, JsonApiException,\
     InvalidSort, ObjectNotFound, InvalidInclude
 from flask_rest_jsonapi.data_layers.filtering.alchemy import create_filters
 from flask_rest_jsonapi.schema import get_model_field, get_related_schema, get_relationships, get_nested_fields, get_schema_field
