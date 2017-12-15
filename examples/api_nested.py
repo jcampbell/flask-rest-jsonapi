@@ -28,6 +28,7 @@ class Person(db.Model):
     birth_date = db.Column(db.Date)
     password = db.Column(db.String)
     tags = db.relationship("Person_Tag", cascade="save-update, merge, delete, delete-orphan")
+    single_tag = db.relationship("Person_Single_Tag", uselist=False, cascade="save-update, merge, delete, delete-orphan")
 
 
 class Computer(db.Model):
@@ -42,12 +43,27 @@ class Person_Tag(db.Model):
     key = db.Column(db.String, primary_key=True)
     value = db.Column(db.String, primary_key=True)
 
+
+class Person_Single_Tag(db.Model):
+    id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True, index=True)
+    key = db.Column(db.String, primary_key=True)
+    value = db.Column(db.String, primary_key=True)
+
 db.create_all()
 
 # Create schema
 class PersonTagSchema(MarshmallowSchema):
     class Meta:
         type_ = 'person_tag'
+
+    id = fields.Str(dump_only=True, load_only=True)
+    key = fields.Str()
+    value = fields.Str()
+
+
+class PersonSingleTagSchema(MarshmallowSchema):
+    class Meta:
+        type_ = 'person_single_tag'
 
     id = fields.Str(dump_only=True, load_only=True)
     key = fields.Str()
@@ -73,7 +89,8 @@ class PersonSchema(Schema):
                              many=True,
                              schema='ComputerSchema',
                              type_='computer')
-    tags = fields.List(fields.Nested(PersonTagSchema))
+    tags = fields.Nested(PersonTagSchema, many=True)
+    single_tag = fields.Nested(PersonSingleTagSchema, many=False)
 
 
 class ComputerSchema(Schema):
